@@ -15,8 +15,6 @@ from pwm import PWM
 from pin import Pin
 from adc import ADC
 from filedb import fileDB
-import time
-
 
 
 class Picarx(object):
