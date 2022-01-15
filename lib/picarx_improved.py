@@ -40,7 +40,7 @@ class Picarx(object):
         self.camera_servo_pin1 = Servo(PWM('P0'))
         self.camera_servo_pin2 = Servo(PWM('P1'))
         self.config_flie = fileDB('/home/pi/.config')
-        self.dir_cal_value = int(self.config_flie.get("picarx_dir_servo", default_value=0))
+        self.dir_cal_value = int(self.config_flie.get("picarx_dir_servo", default_value=-15))
         self.cam_cal_value_1 = int(self.config_flie.get("picarx_cam1_servo", default_value=0))
         self.cam_cal_value_2 = int(self.config_flie.get("picarx_cam2_servo", default_value=0))
         self.dir_servo_pin.angle(self.dir_cal_value)
@@ -120,9 +120,10 @@ class Picarx(object):
 
     def set_dir_servo_angle(self,value):
         # global dir_cal_value
+        #print("ASDAASKLDALKDS")
         self.dir_current_angle = value
         angle_value  = value + self.dir_cal_value
-        print("angle_value:",angle_value)
+        #print("angle_value:",angle_value)
         # print("set_dir_servo_angle_1:",angle_value)
         # print("set_dir_servo_angle_2:",dir_cal_value)
         self.dir_servo_pin.angle(angle_value)
@@ -172,7 +173,8 @@ class Picarx(object):
             if abs_current_angle > 40:
                 abs_current_angle = 40
             power_scale = (100 - abs_current_angle) / 100.0 
-            print("power_scale:",power_scale)
+            #print("power_scale:",power_scale)
+            #logging.debug("power_scale:",power_scale)
             if (current_angle / abs_current_angle) > 0:
                 self.set_motor_speed(1, -1*speed)
                 self.set_motor_speed(2, speed * power_scale)
@@ -195,7 +197,8 @@ class Picarx(object):
             if abs_current_angle > 40:
                 abs_current_angle = 40
             power_scale = (100 - abs_current_angle) / 100.0 
-            print("power_scale:",power_scale)
+            #print("power_scale:",power_scale)
+            logging.debug("power_scale:",power_scale)
             if (current_angle / abs_current_angle) > 0:
                 self.set_motor_speed(1, speed) # fast wheel
                 self.set_motor_speed(2, -1*speed * power_scale) # slow wheel
@@ -216,9 +219,6 @@ class Picarx(object):
     def stopMotorsWhenTerminated(self):
 
         self.stop() #stop motors
-
-
-    
 
 
     def Get_distance(self):
@@ -250,6 +250,9 @@ class Picarx(object):
 
 if __name__ == "__main__":
     px = Picarx()
+    #print("A")
+    #px.set_dir_servo_angle(-15)
+    time.sleep(2)
     px.forward(50)
     time.sleep(2)
     px.stop()
