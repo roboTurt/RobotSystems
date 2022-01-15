@@ -46,6 +46,398 @@ timer = [
     }
 ] * 4
 
+
+
+        
+
+class Servo():
+
+    MAX_PW = 2500
+    MIN_PW = 500
+    _freq = 50
+
+    def __init__(self, pwm):
+        super().__init__()
+        self.pwm = pwm
+        self.pwm.period(4095)
+        #prescaler = int(float(self.pwm.CLOCK) /self.pwm._freq/self.pwm.period())
+        prescaler = 0
+        self.pwm.prescaler(prescaler)
+        # self.angle(90)
+
+
+    def map(self, x, in_min, in_max, out_min, out_max):
+
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+
+    # angle ranges -90 to 90 degrees
+    def angle(self, angle):
+        pass 
+        # if not (isinstance(angle, int) or isinstance(angle, float)):
+        #     raise ValueError("Angle value should be int or float value, not %s"%type(angle))
+        # if angle < -90:
+        #     angle = -90
+        # if angle > 90:
+        #     angle = 90
+        # High_level_time = self.map(angle, -90, 90, self.MIN_PW, self.MAX_PW)
+        # # self._debug("High_level_time: %f" % High_level_time)
+        # pwr =  High_level_time / 20000
+        # # self._debug("pulse width rate: %f" % pwr)
+        # value = int(pwr*self.pwm.period())
+        # # self._debug("pulse width value: %d" % value)
+        # self.pwm.pulse_width(value)
+
+
+class Pin(object):
+    # OUT = GPIO.OUT
+    # IN = GPIO.IN
+    # IRQ_FALLING = GPIO.FALLING
+    # IRQ_RISING = GPIO.RISING
+    # IRQ_RISING_FALLING = GPIO.BOTH
+    # PULL_UP = GPIO.PUD_UP
+    # PULL_DOWN = GPIO.PUD_DOWN
+    PULL_NONE = None
+
+    _dict = {
+        "BOARD_TYPE": 12,
+    }
+
+    _dict_1 = {
+        "D0":  17,
+        "D1":  18,
+        "D2":  27,
+        "D3":  22,
+        "D4":  23,
+        "D5":  24,
+        "D6":  25,
+        "D7":  4,
+        "D8":  5,
+        "D9":  6,
+        "D10": 12,
+        "D11": 13,
+        "D12": 19,
+        "D13": 16,
+        "D14": 26,
+        "D15": 20,
+        "D16": 21,
+        "SW":  19,
+        "LED": 26,
+        "BOARD_TYPE": 12,
+        "RST": 16,
+        "BLEINT": 13,
+        "BLERST": 20,
+        "MCURST": 21,
+    }
+
+    _dict_2 = {
+        "D0":  17,
+        "D1":   4, # Changed
+        "D2":  27,
+        "D3":  22,
+        "D4":  23,
+        "D5":  24,
+        "D6":  25, # Removed
+        "D7":   4, # Removed
+        "D8":   5, # Removed
+        "D9":   6,
+        "D10": 12,
+        "D11": 13,
+        "D12": 19,
+        "D13": 16,
+        "D14": 26,
+        "D15": 20,
+        "D16": 21,
+        "SW":  25, # Changed
+        "LED": 26,
+        "BOARD_TYPE": 12,
+        "RST": 16,
+        "BLEINT": 13,
+        "BLERST": 20,
+        "MCURST":  5, # Changed
+    }
+
+    def __init__(self, *value):
+        #super().__init__()
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setwarnings(False)
+        pass 
+        # self.check_board_type()
+
+        # if len(value) > 0:
+        #     pin = value[0]
+        # if len(value) > 1:
+        #     mode = value[1]
+        # else:
+        #     mode = None
+        # if len(value) > 2:
+        #     setup = value[2]
+        # else:
+        #     setup = None
+        # if isinstance(pin, str):
+        #     try:
+        #         self._board_name = pin
+        #         self._pin = self.dict()[pin]
+        #     except Exception as e:
+        #         print(e)
+        #         self._error('Pin should be in %s, not %s' % (self._dict.keys(), pin))
+        # elif isinstance(pin, int):
+        #     self._pin = pin
+        # else:
+        #     self._error('Pin should be in %s, not %s' % (self._dict.keys(), pin))
+        # self._value = 0
+        # self.init(mode, pull=setup)
+        # self._info("Pin init finished.")
+        
+    def check_board_type(self):
+        pass
+        # type_pin = self.dict()["BOARD_TYPE"]
+        # GPIO.setup(type_pin, GPIO.IN)
+        # if GPIO.input(type_pin) == 0:
+        #     self._dict = self._dict_1
+        # else:
+        #     self._dict = self._dict_2
+
+    def init(self, mode, pull=PULL_NONE):
+        pass
+        # self._pull = pull
+        # self._mode = mode
+        # if mode != None:
+        #     if pull != None:
+        #         GPIO.setup(self._pin, mode, pull_up_down=pull)
+        #     else:
+        #         GPIO.setup(self._pin, mode)
+
+    def dict(self, *_dict):
+        if len(_dict) == 0:
+            return self._dict
+        else:
+            if isinstance(_dict, dict):
+                self._dict = _dict
+            else:
+                self._error(
+                    'argument should be a pin dictionary like {"my pin": ezblock.Pin.cpu.GPIO17}, not %s' % _dict)
+
+    def __call__(self, value):
+        return self.value(value)
+
+    def value(self, *value):
+        if len(value) == 0:
+            #self.mode(self.IN)
+            #result = GPIO.input(self._pin)
+            # self._debug("read pin %s: %s" % (self._pin, result))
+            #return result
+            return 1
+        else:
+            #value = value[0]
+            #self.mode(self.OUT)
+            #GPIO.output(self._pin, value)
+            return value
+
+    def on(self):
+        return self.value(1)
+
+    def off(self):
+        return self.value(0)
+
+    def high(self):
+        return self.on()
+
+    def low(self):
+        return self.off()
+
+    def mode(self, *value):
+        if len(value) == 0:
+            return self._mode
+        else:
+            mode = value[0]
+            self._mode = mode
+            #GPIO.setup(self._pin, mode)
+
+    def pull(self, *value):
+        return self._pull
+
+    def irq(self, handler=None, trigger=None, bouncetime=200):
+        pass
+        #self.mode(self.IN)
+        #GPIO.add_event_detect(self._pin, trigger, callback=handler, bouncetime=bouncetime)
+
+    def name(self):
+        return "GPIO%s"%self._pin
+
+    def names(self):
+        return [self.name, self._board_name]
+
+    class cpu(object):
+        GPIO17 = 17
+        GPIO18 = 18
+        GPIO27 = 27
+        GPIO22 = 22
+        GPIO23 = 23
+        GPIO24 = 24
+        GPIO25 = 25
+        GPIO26 = 26
+        GPIO4  = 4
+        GPIO5  = 5
+        GPIO6  = 6
+        GPIO12 = 12
+        GPIO13 = 13
+        GPIO19 = 19
+        GPIO16 = 16
+        GPIO26 = 26
+        GPIO20 = 20
+        GPIO21 = 21
+
+        def __init__(self):
+            pass
+
+#from i2c import I2C
+
+
+class I2C(object):
+    MASTER = 0
+    SLAVE  = 1
+    RETRY = 5
+
+    def __init__(self, *args, **kargs):     # *args表示位置参数（形式参数），可无，； **kargs表示默认值参数，可无。
+        super().__init__()
+        #self._bus = 1
+        #self._smbus = SMBus(self._bus)
+
+    def _i2c_write_byte(self, addr, data):   # i2C 写系列函数
+        # self._debug("_i2c_write_byte: [0x{:02X}] [0x{:02X}]".format(addr, data))
+        return self._smbus.write_byte(addr, data)
+    
+    def _i2c_write_byte_data(self, addr, reg, data):
+        # self._debug("_i2c_write_byte_data: [0x{:02X}] [0x{:02X}] [0x{:02X}]".format(addr, reg, data))
+        return self._smbus.write_byte_data(addr, reg, data)
+    
+    def _i2c_write_word_data(self, addr, reg, data):
+        # self._debug("_i2c_write_word_data: [0x{:02X}] [0x{:02X}] [0x{:04X}]".format(addr, reg, data))
+        return self._smbus.write_word_data(addr, reg, data)
+    
+    def _i2c_write_i2c_block_data(self, addr, reg, data):
+        # self._debug("_i2c_write_i2c_block_data: [0x{:02X}] [0x{:02X}] {}".format(addr, reg, data))
+        return self._smbus.write_i2c_block_data(addr, reg, data)
+    
+    def _i2c_read_byte(self, addr):   # i2C 读系列函数
+        # self._debug("_i2c_read_byte: [0x{:02X}]".format(addr))
+        return self._smbus.read_byte(addr)
+
+    def _i2c_read_i2c_block_data(self, addr, reg, num):
+        # self._debug("_i2c_read_i2c_block_data: [0x{:02X}] [0x{:02X}] [{}]".format(addr, reg, num))
+        return self._smbus.read_i2c_block_data(addr, reg, num)
+
+    def is_ready(self, addr):
+        addresses = self.scan()
+        if addr in addresses:
+            return True
+        else:
+            return False
+
+    def scan(self):                             # 查看有哪些i2c设备
+        cmd = "i2cdetect -y %s" % self._bus
+        _, output = self.run_command(cmd)          # 调用basic中的方法，在linux中运行cmd指令，并返回运行后的内容
+        
+        outputs = output.split('\n')[1:]        # 以回车符为分隔符，分割第二行之后的所有行
+        # self._debug("outputs")
+        addresses = []
+        for tmp_addresses in outputs:
+            if tmp_addresses == "":
+                continue
+            tmp_addresses = tmp_addresses.split(':')[1]
+            tmp_addresses = tmp_addresses.strip().split(' ')    # strip函数是删除字符串两端的字符，split函数是分隔符
+            for address in tmp_addresses:
+                if address != '--':
+                    addresses.append(int(address, 16))
+        # self._debug("Conneceted i2c device: %s"%addresses)                   # append以列表的方式添加address到addresses中
+        return addresses
+
+    def send(self, send, addr, timeout=0):   
+        pass                   # 发送数据，addr为从机地址，send为数据
+        # if isinstance(send, bytearray):
+        #     data_all = list(send)
+        # elif isinstance(send, int):
+        #     data_all = []
+        #     d = "{:X}".format(send)
+        #     d = "{}{}".format("0" if len(d)%2 == 1 else "", d)  # format是将()中的内容对应填入{}中，（）中的第一个参数是一个三目运算符，if条件成立则为“0”，不成立则为“”(空的意思)，第二个参数是d，此行代码意思为，当字符串为奇数位时，在字符串最强面添加‘0’，否则，不添加， 方便以下函数的应用
+        #     # print(d)
+        #     for i in range(len(d)-2, -1, -2):       # 从字符串最后开始取，每次取2位
+        #         tmp = int(d[i:i+2], 16)             # 将两位字符转化为16进制
+        #         # print(tmp)
+        #         data_all.append(tmp)                # 添加到data_all数组中
+        #     data_all.reverse()
+        # elif isinstance(send, list):
+        #     data_all = send
+        # else:
+        #     raise ValueError("send data must be int, list, or bytearray, not {}".format(type(send)))
+
+        # if len(data_all) == 1:                      # 如果data_all只有一组数
+        #     data = data_all[0]
+        #     self._i2c_write_byte(addr, data)
+        # elif len(data_all) == 2:                    # 如果data_all只有两组数
+        #     reg = data_all[0]
+        #     data = data_all[1]
+        #     self._i2c_write_byte_data(addr, reg, data)
+        # elif len(data_all) == 3:                    # 如果data_all只有三组数
+        #     reg = data_all[0]
+        #     data = (data_all[2] << 8) + data_all[1]
+        #     self._i2c_write_word_data(addr, reg, data)
+        # else:
+        #     reg = data_all[0]
+        #     data = list(data_all[1:])
+        #     self._i2c_write_i2c_block_data(addr, reg, data)
+
+    def recv(self, recv, addr=0x00, timeout=0):     # 接收数据
+        if isinstance(recv, int):                   # 将recv转化为二进制数
+            result = bytearray(recv)
+        elif isinstance(recv, bytearray):
+            result = recv
+        else:
+            return False
+        for i in range(len(result)):
+            result[i] = self._i2c_read_byte(addr)
+        return result
+
+    def mem_write(self, data, addr, memaddr, timeout=5000, addr_size=8): #memaddr match to chn
+        pass 
+        # if isinstance(data, bytearray):
+        #     data_all = list(data)
+        # elif isinstance(data, list):
+        #     data_all = data
+        # elif isinstance(data, int):
+        #     data_all = []
+        #     data = "%x"%data
+        #     if len(data) % 2 == 1:
+        #         data = "0" + data
+        #     # print(data)
+        #     for i in range(0, len(data), 2):
+        #         # print(data[i:i+2])
+        #         data_all.append(int(data[i:i+2], 16))
+        # else:
+        #     raise ValueError("memery write require arguement of bytearray, list, int less than 0xFF")
+        # # print(data_all)
+        # self._i2c_write_i2c_block_data(addr, memaddr, data_all)
+    
+    def mem_read(self, data, addr, memaddr, timeout=5000, addr_size=8):     # 读取数据
+        if isinstance(data, int):
+            num = data
+        elif isinstance(data, bytearray):
+            num = len(data)
+        else:
+            return False
+        result = bytearray(self._i2c_read_i2c_block_data(addr, memaddr, num))
+        return result
+    
+    def readfrom_mem_into(self, addr, memaddr, buf):
+        buf = self.mem_read(len(buf), addr, memaddr)
+        return buf
+    
+    def writeto_mem(self, addr, memaddr, data):
+        pass 
+        self.mem_write(data, addr, memaddr)
+
+
 class PWM(I2C):
     REG_CHN = 0x20
     REG_FRE = 0x30
@@ -74,7 +466,7 @@ class PWM(I2C):
         # self._debug("PWM address: {:02X}".format(self.ADDR))
         self.channel = channel
         self.timer = int(channel/4)
-        self.bus = smbus.SMBus(1)
+        #self.bus = smbus.SMBus(1)
         self._pulse_width = 0
         self._freq = 50
         self.freq(50)
@@ -148,248 +540,6 @@ class PWM(I2C):
         #     pulse_width = temp * timer[self.timer]["arr"]
         #     self.pulse_width(pulse_width)
 
-        
-
-class Servo():
-
-    MAX_PW = 2500
-    MIN_PW = 500
-    _freq = 50
-
-    def __init__(self, pwm):
-        super().__init__()
-        self.pwm = pwm
-        self.pwm.period(4095)
-        prescaler = int(float(self.pwm.CLOCK) /self.pwm._freq/self.pwm.period())
-        self.pwm.prescaler(prescaler)
-        # self.angle(90)
-
-
-    def map(self, x, in_min, in_max, out_min, out_max):
-
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-
-
-    # angle ranges -90 to 90 degrees
-    def angle(self, angle):
-        pass 
-        # if not (isinstance(angle, int) or isinstance(angle, float)):
-        #     raise ValueError("Angle value should be int or float value, not %s"%type(angle))
-        # if angle < -90:
-        #     angle = -90
-        # if angle > 90:
-        #     angle = 90
-        # High_level_time = self.map(angle, -90, 90, self.MIN_PW, self.MAX_PW)
-        # # self._debug("High_level_time: %f" % High_level_time)
-        # pwr =  High_level_time / 20000
-        # # self._debug("pulse width rate: %f" % pwr)
-        # value = int(pwr*self.pwm.period())
-        # # self._debug("pulse width value: %d" % value)
-        # self.pwm.pulse_width(value)
-
-
-class Pin(object):
-    OUT = GPIO.OUT
-    IN = GPIO.IN
-    IRQ_FALLING = GPIO.FALLING
-    IRQ_RISING = GPIO.RISING
-    IRQ_RISING_FALLING = GPIO.BOTH
-    PULL_UP = GPIO.PUD_UP
-    PULL_DOWN = GPIO.PUD_DOWN
-    PULL_NONE = None
-
-    _dict = {
-        "BOARD_TYPE": 12,
-    }
-
-    _dict_1 = {
-        "D0":  17,
-        "D1":  18,
-        "D2":  27,
-        "D3":  22,
-        "D4":  23,
-        "D5":  24,
-        "D6":  25,
-        "D7":  4,
-        "D8":  5,
-        "D9":  6,
-        "D10": 12,
-        "D11": 13,
-        "D12": 19,
-        "D13": 16,
-        "D14": 26,
-        "D15": 20,
-        "D16": 21,
-        "SW":  19,
-        "LED": 26,
-        "BOARD_TYPE": 12,
-        "RST": 16,
-        "BLEINT": 13,
-        "BLERST": 20,
-        "MCURST": 21,
-    }
-
-    _dict_2 = {
-        "D0":  17,
-        "D1":   4, # Changed
-        "D2":  27,
-        "D3":  22,
-        "D4":  23,
-        "D5":  24,
-        "D6":  25, # Removed
-        "D7":   4, # Removed
-        "D8":   5, # Removed
-        "D9":   6,
-        "D10": 12,
-        "D11": 13,
-        "D12": 19,
-        "D13": 16,
-        "D14": 26,
-        "D15": 20,
-        "D16": 21,
-        "SW":  25, # Changed
-        "LED": 26,
-        "BOARD_TYPE": 12,
-        "RST": 16,
-        "BLEINT": 13,
-        "BLERST": 20,
-        "MCURST":  5, # Changed
-    }
-
-    def __init__(self, *value):
-        #super().__init__()
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-
-        self.check_board_type()
-
-        if len(value) > 0:
-            pin = value[0]
-        if len(value) > 1:
-            mode = value[1]
-        else:
-            mode = None
-        if len(value) > 2:
-            setup = value[2]
-        else:
-            setup = None
-        if isinstance(pin, str):
-            try:
-                self._board_name = pin
-                self._pin = self.dict()[pin]
-            except Exception as e:
-                print(e)
-                self._error('Pin should be in %s, not %s' % (self._dict.keys(), pin))
-        elif isinstance(pin, int):
-            self._pin = pin
-        else:
-            self._error('Pin should be in %s, not %s' % (self._dict.keys(), pin))
-        self._value = 0
-        self.init(mode, pull=setup)
-        # self._info("Pin init finished.")
-        
-    def check_board_type(self):
-        pass
-        # type_pin = self.dict()["BOARD_TYPE"]
-        # GPIO.setup(type_pin, GPIO.IN)
-        # if GPIO.input(type_pin) == 0:
-        #     self._dict = self._dict_1
-        # else:
-        #     self._dict = self._dict_2
-
-    def init(self, mode, pull=PULL_NONE):
-        pass
-        # self._pull = pull
-        # self._mode = mode
-        # if mode != None:
-        #     if pull != None:
-        #         GPIO.setup(self._pin, mode, pull_up_down=pull)
-        #     else:
-        #         GPIO.setup(self._pin, mode)
-
-    def dict(self, *_dict):
-        if len(_dict) == 0:
-            return self._dict
-        else:
-            if isinstance(_dict, dict):
-                self._dict = _dict
-            else:
-                self._error(
-                    'argument should be a pin dictionary like {"my pin": ezblock.Pin.cpu.GPIO17}, not %s' % _dict)
-
-    def __call__(self, value):
-        return self.value(value)
-
-    def value(self, *value):
-        if len(value) == 0:
-            self.mode(self.IN)
-            result = GPIO.input(self._pin)
-            # self._debug("read pin %s: %s" % (self._pin, result))
-            return result
-        else:
-            value = value[0]
-            self.mode(self.OUT)
-            GPIO.output(self._pin, value)
-            return value
-
-    def on(self):
-        return self.value(1)
-
-    def off(self):
-        return self.value(0)
-
-    def high(self):
-        return self.on()
-
-    def low(self):
-        return self.off()
-
-    def mode(self, *value):
-        if len(value) == 0:
-            return self._mode
-        else:
-            mode = value[0]
-            self._mode = mode
-            GPIO.setup(self._pin, mode)
-
-    def pull(self, *value):
-        return self._pull
-
-    def irq(self, handler=None, trigger=None, bouncetime=200):
-        pass
-        self.mode(self.IN)
-        GPIO.add_event_detect(self._pin, trigger, callback=handler, bouncetime=bouncetime)
-
-    def name(self):
-        return "GPIO%s"%self._pin
-
-    def names(self):
-        return [self.name, self._board_name]
-
-    class cpu(object):
-        GPIO17 = 17
-        GPIO18 = 18
-        GPIO27 = 27
-        GPIO22 = 22
-        GPIO23 = 23
-        GPIO24 = 24
-        GPIO25 = 25
-        GPIO26 = 26
-        GPIO4  = 4
-        GPIO5  = 5
-        GPIO6  = 6
-        GPIO12 = 12
-        GPIO13 = 13
-        GPIO19 = 19
-        GPIO16 = 16
-        GPIO26 = 26
-        GPIO20 = 20
-        GPIO21 = 21
-
-        def __init__(self):
-            pass
-
-from i2c import I2C
 
 class ADC(I2C):
     ADDR=0x14                   # 扩展板的地址为0x14
@@ -428,67 +578,17 @@ class ADC(I2C):
     def read_voltage(self):                             # 将读取的数据转化为电压值（0~3.3V）
         return self.read*3.3/4095
         
-
 class fileDB(object):
-	"""A file based database.
 
-    A file based database, read and write arguements in the specific file.
-    """
-	def __init__(self, db=None):
-		'''Init the db_file is a file to save the datas.'''
+    def __init__(self, db = None):
 
-		# Check if db_file is defined
-		if db != None:
-			self.db = db
-		else:
-			self.db = "config"
+        pass
 
-	def get(self, name, default_value=None):
-		"""Get value by data's name. Default value is for the arguemants do not exist"""
-		try:
-			conf = open(self.db,'r')
-			lines=conf.readlines()
-			conf.close()
-			file_len=len(lines)-1
-			flag = False
-			# Find the arguement and set the value
-			for i in range(file_len):
-				if lines[i][0] != '#':
-					if lines[i].split('=')[0].strip() == name:
-						value = lines[i].split('=')[1].replace(' ', '').strip()
-						flag = True
-			if flag:
-				return value
-			else:
-				return default_value
-		except FileNotFoundError:
-			conf = open(self.db,'w')
-			conf.write("")
-			conf.close()
-			return default_value
-		except :
-			return default_value
-	
-	def set(self, name, value):
-		"""Set value by data's name. Or create one if the arguement does not exist"""
+    def get(self, name, default_value=None):
 
-		# Read the file
-		conf = open(self.db,'r')
-		lines=conf.readlines()
-		conf.close()
-		file_len=len(lines)-1
-		flag = False
-		# Find the arguement and set the value
-		for i in range(file_len):
-			if lines[i][0] != '#':
-				if lines[i].split('=')[0].strip() == name:
-					lines[i] = '%s = %s\n' % (name, value)
-					flag = True
-		# If arguement does not exist, create one
-		if not flag:
-			lines.append('%s = %s\n\n' % (name, value))
+        return default_value
 
-		# Save the file
-		conf = open(self.db,'w')
-		conf.writelines(lines)
-		conf.close()
+    
+    def set(self, name, value):
+
+        pass 

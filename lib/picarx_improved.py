@@ -2,6 +2,11 @@ import time
 try:
     from ezblock import *
     from ezblock import __reset_mcu__
+    from servo import Servo 
+    from pwm import PWM
+    from pin import Pin
+    from adc import ADC
+    from filedb import fileDB
     __reset_mcu__ ()
     time.sleep (0.01)
 except ImportError:
@@ -9,19 +14,27 @@ except ImportError:
             "Shadowing hardware calls with substitute functions")
     from sim_ezblock import *
 
+#import logging library
+import atexit
+import logging
+from logdecorator import log_on_start , log_on_end , log_on_error
+logging_format = "%(asctime)s: %(message)s"
+logging.basicConfig(format=logging_format , level=logging.INFO , datefmt ="%H:%M:%S")
 
-from servo import Servo 
-from pwm import PWM
-from pin import Pin
-from adc import ADC
-from filedb import fileDB
+logging.getLogger ().setLevel(logging.DEBUG)           
+
+
+# from servo import Servo 
+# from pwm import PWM
+# from pin import Pin
+# from adc import ADC
+# from filedb import fileDB
 
 
 class Picarx(object):
     PERIOD = 4095
     PRESCALER = 10
     TIMEOUT = 0.02
-
     def __init__(self):
         self.dir_servo_pin = Servo(PWM('P2'))
         self.camera_servo_pin1 = Servo(PWM('P0'))
@@ -54,9 +67,12 @@ class Picarx(object):
         for pin in self.motor_speed_pins:
             pin.period(self.PERIOD)
             pin.prescaler(self.PRESCALER)
+        
+        atexit.register(self.stopMotorsWhenTerminated)
 
-
-
+    @log_on_start(logging.DEBUG , "Setting Motor {motor:n} to speed value: {speed:f} \n ")
+    @log_on_error(logging.DEBUG , "Error while setting motor speed \n ")
+    @log_on_end(logging.DEBUG , "Motor {motor:n} successfully set to speed value: {speed:f} \n ")
     def set_motor_speed(self,motor,speed):
         # global cali_speed_value,cali_dir_value
         motor -= 1
@@ -65,8 +81,8 @@ class Picarx(object):
         elif speed < 0:
             direction = -1 * self.cali_dir_value[motor]
         speed = abs(speed)
-        if speed != 0:
-            speed = int(speed /2 ) + 50
+        # if speed != 0:
+        #     speed = int(speed /2 ) + 50
         speed = speed - self.cali_speed_value[motor]
         if direction < 0:
             self.motor_direction_pins[motor].high()
@@ -166,10 +182,14 @@ class Picarx(object):
         else:
             self.set_motor_speed(1, -1*speed)
             self.set_motor_speed(2, speed)  
-
+    
+    @log_on_start(logging.DEBUG , "Moving PicarX Forward... WARNING!!!! MAKE SURE CAR IS ON THE FLOOR...")
+    @log_on_error(logging.DEBUG , "Error in px.forward()")
+    @log_on_end(logging.DEBUG , "Motor speed commmands set successfully")
     def forward(self,speed):
         current_angle = self.dir_current_angle
         if current_angle != 0:
+            #If turn angle is commanded, modify motor speeds to match the turn angle in order to prevent wheel slip
             abs_current_angle = abs(current_angle)
             # if abs_current_angle >= 0:
             if abs_current_angle > 40:
@@ -177,18 +197,28 @@ class Picarx(object):
             power_scale = (100 - abs_current_angle) / 100.0 
             print("power_scale:",power_scale)
             if (current_angle / abs_current_angle) > 0:
-                self.set_motor_speed(1, speed)
-                self.set_motor_speed(2, -1*speed * power_scale)
+                self.set_motor_speed(1, speed) # fast wheel
+                self.set_motor_speed(2, -1*speed * power_scale) # slow wheel
             else:
-                self.set_motor_speed(1, speed * power_scale)
-                self.set_motor_speed(2, -1*speed )
+                self.set_motor_speed(1, speed * power_scale) #slow wheel
+                self.set_motor_speed(2, -1*speed ) #fast wheel
         else:
+            #if no turn angle is commanded, spin both motors at the same speed
             self.set_motor_speed(1, speed)
             self.set_motor_speed(2, -1*speed)                  
 
     def stop(self):
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
+
+
+    @log_on_start(logging.DEBUG , "End of Program, stopping motors... ")
+    def stopMotorsWhenTerminated(self):
+
+        self.stop() #stop motors
+
+
+    
 
 
     def Get_distance(self):
@@ -221,7 +251,7 @@ class Picarx(object):
 if __name__ == "__main__":
     px = Picarx()
     px.forward(50)
-    time.sleep(1)
+    time.sleep(2)
     px.stop()
     # set_dir_servo_angle(0)
     # time.sleep(1)
