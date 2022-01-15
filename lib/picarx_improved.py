@@ -165,6 +165,9 @@ class Picarx(object):
         self.set_motor_speed(1, speed)
         self.set_motor_speed(2, speed) 
 
+    @log_on_start(logging.DEBUG , "Moving PicarX backward... WARNING!!!! MAKE SURE CAR IS ON THE FLOOR...")
+    @log_on_error(logging.DEBUG , "Error in px.backward()")
+    @log_on_end(logging.DEBUG , "Motor speed commmands set successfully")
     def backward(self,speed):
         current_angle = self.dir_current_angle
         if current_angle != 0:
