@@ -35,8 +35,8 @@ import time
 if __name__ == "__main__":
 
     px = Picarx()
-    #set steering servo to angle 0
-    #px.set_dir_servo_angle(0)
+    #set steering servo angle
+    px.set_dir_servo_angle(-15)
     #drive forward for a short time
     px.forward(50)
     time.sleep(2)
