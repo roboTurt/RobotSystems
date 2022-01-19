@@ -17,39 +17,41 @@ if __name__ == "__main__":
 
     Picar_motors = PicarMotors()
     Picar_sensors = Sensors()
-    Linefollow_Interpreter = Interpreter(sensitivity = 1200, polarity = -1)
+    Linefollow_Interpreter = Interpreter(sensitivity = 300, polarity = -1)
     Linefollow_Controller = Controller(scalingFactor = 15)
 
     while True:
         
         
-        userInput = input("Press x to quit   ")
+        #userInput = input("Press x to quit   ")
 
         sensorReadings = Picar_sensors.get_adc_value() #read sensors
         
-        time.sleep(0.01)
+        time.sleep(0.001)
         
-        carRelativePosToLine = Linefollow_Interpreter(sensorReadings) #determine position
+        carRelativePosToLine = Linefollow_Interpreter.carRelativePosition2Line(sensorReadings) #determine position
+        #logging.debug(sensorReadings)
+        time.sleep(0.001)
+        logging.debug(f"position of car: {carRelativePosToLine}")
+        servoAngle = Linefollow_Controller.adjustSteeringAngle(carRelativePosToLine) #adjust steering servo angle
         
-        time.sleep(0.01)
-        
-        servoAngle = Linefollow_Controller(carRelativePosToLine) #adjust steering servo angle
-        
-        time.sleep(0.01)
+        time.sleep(0.001)
 
-
+        #logging.debug(f"servo angle:  {servoAngle}")
+            
         averageSensorValue = statistics.mean(sensorReadings)
-        if math.isclose(0,sensorReadings[0] - averageSensorValue, 100) and math.isclose(0,sensorReadings[1] - averageSensorValue, 100) \
-            and math.isclose(0,sensorReadings[2] - averageSensorValue, 100):
 
+        if math.isclose(sensorReadings[0],sensorReadings[1], abs_tol = 20) and math.isclose(sensorReadings[0],sensorReadings[2], abs_tol = 20): 
+
+                Picar_motors.set_dir_servo_angle(0)
                 Picar_motors.stop()
-                time.sleep(1)
+                #time.sleep(1)
 
         else:
-
+            Picar_motors.set_dir_servo_angle(servoAngle)
             Picar_motors.forward(40)
-            time.sleep(0.5)
+            time.sleep(0.005)
 
-        if userInput == "x":
+        # if userInput == "x":
 
-            break 
+        #     break 

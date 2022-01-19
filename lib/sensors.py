@@ -2,6 +2,7 @@ try:
 
     from picarx_improved import *
 
+
 except ImportError:
 
     print("Unable to import from picarx_improved")
@@ -26,7 +27,7 @@ import numpy as np
 import statistics
 
 class Interpreter():
-    def __init__(self, sensitivity = 1000, polarity = -1):
+    def __init__(self, sensitivity = 600, polarity = -1):
         #import numpy as np
         #Sensitivity- how different dark and light readings are expected to be
         #Polarity if the line being followed is lighter or darker than floor [-1 for darker, 1 for lighter]
@@ -61,7 +62,14 @@ class Interpreter():
 
             relPos_left_right = np.interp(left_right_sensor_delta, [-self.sensitivity,self.sensitivity],[-1,1])
             
-            relativePosition = statistics.mean([relPos_left_middle,relPos_right_middle,relPos_left_right])
+            readings = [relPos_left_middle,relPos_right_middle,relPos_left_right]
+
+            absValReadings = [abs(x) for x in readings]
+
+            max_Value = max(absValReadings)
+            max_Index = absValReadings.index(max_Value)
+            relativePosition = readings[max_Index]
+            #relativePosition = statistics.mean([relPos_left_middle,relPos_right_middle,relPos_left_right])
             #return relativePosition
 
 

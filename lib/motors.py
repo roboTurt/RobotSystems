@@ -58,7 +58,7 @@ class PicarMotors(Picarx):
                 abs_current_angle = 40
             power_scale = (100 - abs_current_angle) / 100.0 
             #print("power_scale:",power_scale)
-            logging.debug("power_scale:",power_scale)
+            #logging.debug("power_scale:",power_scale)
             if (current_angle / abs_current_angle) > 0:
                 self.set_motor_speed(1, speed) # fast wheel
                 self.set_motor_speed(2, -1*speed * power_scale) # slow wheel
@@ -118,6 +118,19 @@ class PicarMotors(Picarx):
         else:
             self.motor_direction_pins[motor].low()
             self.motor_speed_pins[motor].pulse_width_percent(speed)
+
+    @log_on_start(logging.DEBUG , "Setting Servo Steering Angle to: {value:f} \n ")
+    @log_on_error(logging.DEBUG , "Error while setting steering angle \n ")
+    @log_on_end(logging.DEBUG , "Servo successfully set to angle value: {value:f} \n ")
+    def set_dir_servo_angle(self,value):
+        # global dir_cal_value
+        self.dir_current_angle = value
+        angle_value  = value + self.dir_cal_value
+        #print("angle_value:",angle_value)
+        # print("set_dir_servo_angle_1:",angle_value)
+        # print("set_dir_servo_angle_2:",dir_cal_value)
+        self.dir_servo_pin.angle(angle_value)
+
 
     def motor_speed_calibration(self,value):
         # global cali_speed_value,cali_dir_value
