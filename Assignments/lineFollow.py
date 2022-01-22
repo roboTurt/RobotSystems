@@ -1,5 +1,9 @@
+import os, sys
+BASE_DIR = os.path.join( os.path.dirname( __file__ ), '..' )
+sys.path.append(BASE_DIR+"/lib")
 
 try:
+
     from sensors import *
     from motors import PicarMotors
     import math
