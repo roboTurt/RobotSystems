@@ -15,7 +15,6 @@ from motors import PicarMotors
 
 _SHOW_IMAGE = False
 
-
 class HandCodedLaneFollower(object):
 
     def __init__(self, car=None):
@@ -306,7 +305,7 @@ def make_points(frame, line):
 
 if __name__ == '__main__':
     #init camera
-    print("start color detect")
+    print("start line recognition")
     camera = PiCamera()
     camera.resolution = (640,480)
     camera.framerate = 24
@@ -318,14 +317,15 @@ if __name__ == '__main__':
 
     for frame in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):# use_video_port=True
 
-        picar_motors.forward(35)
+        picar_motors.forward(35) #move picar forward
 
         #frame = frame.array
-        if frame is not None:
+        if frame is not None: #convert camera frames to steering angle 
             resized_frame = cv2.resize(frame.array, (160,120), interpolation=cv2.INTER_LINEAR) 
             lane_follower.follow_lane(resized_frame)
     
         rawCapture.truncate(0)  
+        
         time.sleep(0.1)
         k = cv2.waitKey(1) & 0xFF
         # 27 is the ESC key, which means that if you press the ESC key to exit
