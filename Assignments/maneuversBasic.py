@@ -1,6 +1,6 @@
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-sys.path.append(ROOT_DIR, "lib"))
+import os, sys
+BASE_DIR = os.path.join( os.path.dirname( __file__ ), '..' )
+sys.path.append(BASE_DIR+"/lib")
 
 try:
 
