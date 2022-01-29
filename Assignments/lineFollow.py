@@ -18,13 +18,18 @@ except ImportError:
 
 if __name__ == "__main__":
 
+    ##initialize class instances
+
     Picar_motors = PicarMotors()
     Picar_sensors = Sensors()
     Linefollow_Interpreter = Interpreter(sensitivity = 300, polarity = -1)
     Linefollow_Controller = Controller(scalingFactor = 15)
 
+
     while True:
-        
+        """
+        Control Loop for line following 
+        """
         
         #userInput = input("Press x to quit   ")
 
@@ -35,26 +40,22 @@ if __name__ == "__main__":
         carRelativePosToLine = Linefollow_Interpreter.carRelativePosition2Line(sensorReadings) #determine position
         #logging.debug(sensorReadings)
         time.sleep(0.001)
-        logging.debug(f"position of car: {carRelativePosToLine}")
+        #logging.debug(f"position of car: {carRelativePosToLine}")
         servoAngle = Linefollow_Controller.adjustSteeringAngle(carRelativePosToLine) #adjust steering servo angle
         
         time.sleep(0.001)
 
-        #logging.debug(f"servo angle:  {servoAngle}")
+        logging.debug(f"servo angle:  {servoAngle}")
             
         averageSensorValue = statistics.mean(sensorReadings)
 
         if math.isclose(sensorReadings[0],sensorReadings[1], abs_tol = 20) and math.isclose(sensorReadings[0],sensorReadings[2], abs_tol = 20): 
-
+                #if all 3 sensor readings are approximately equal, then picar is probably not sitting on a line. Stop Condition 
                 Picar_motors.set_dir_servo_angle(0)
                 Picar_motors.stop()
-                #time.sleep(1)
 
         else:
+            #Adjust steering angle accordingly and drive forward 
             Picar_motors.set_dir_servo_angle(servoAngle)
             Picar_motors.forward(40)
             time.sleep(0.005)
-
-        # if userInput == "x":
-
-        #     break 
