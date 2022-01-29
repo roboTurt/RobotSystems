@@ -16,7 +16,7 @@ Created ```camera_lane_follow.py``` inside ```Assignments``` for camera based li
 
 ## Week 4 Assignments
 
-Created ```Bus.py``` inside ```lib``` that implements message bus
+Created ```Bus.py``` inside ```lib``` that implements message bus \
 Created ```lineFollow_Concurrent.py``` inside ```Assignments``` that uses the message bus to handle concurrent execution of line following tasks 
 
 ## Week 5 Assignments
