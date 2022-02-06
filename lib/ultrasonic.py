@@ -1,6 +1,5 @@
 import time
 
-
 class Ultrasonic():
     def __init__(self, trig, echo, timeout=0.02):
         self.trig = trig

@@ -20,3 +20,8 @@ Created ```Bus.py``` inside ```lib``` that implements message bus \
 Created ```lineFollow_Concurrent.py``` inside ```Assignments``` that uses the message bus to handle concurrent execution of line following tasks 
 
 ## Week 5 Assignments
+
+imported ```rossros.py``` into ```RossROS``` 
+Created ```ultrasound.py``` inside ```lib``` for the sensor, controller, and interpreter classes belonging to the ultrasonic distance sensor 
+Created ```lineFollow_rossROS.py``` in Assignments that uses rossros bus classes to simultaneously process grayscale and ultrasonic distance sensor inputs 
+
