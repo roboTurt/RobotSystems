@@ -25,3 +25,4 @@ imported ```rossros.py``` into ```RossROS```
 Created ```ultrasound.py``` inside ```lib``` for the sensor, controller, and interpreter classes belonging to the ultrasonic distance sensor 
 Created ```lineFollow_rossROS.py``` in Assignments that uses rossros bus classes to simultaneously process grayscale and ultrasonic distance sensor inputs 
 
+### Week 6 Assignments ###
