@@ -107,47 +107,5 @@ if __name__ == "__main__":
 
 
 
-
-
     runConcurrently(list_of_concurrent_services)
     
-    #Reading Sensor values is a producer 
-    #Interpreter is producer consumer
-    #controller is producer consumer 
-
-    # with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as executor:
-    #     """
-    #     Creates workers for all functions that need to be executed concurrently 
-    #     """
-    #     eSensor = executor.submit(Picar_sensors.get_adc_value,grayscale_sensor_bus,grayscale_sensor_delay)
-        
-    #     eInterpreter = executor.submit(Linefollow_Interpreter.carRelativePosition2Line,
-    #                     grayscale_sensor_bus, #read from this bus
-    #                     interpreter_message_bus, #write to this bus 
-    #                     interpreter_message_delay)
-        
-    #     eController = executor.submit(Linefollow_Controller.calculateSteeringAngle, 
-    #                     interpreter_message_bus,#read from this bus
-    #                     controller_message_bus, #write to this bus 
-    #                     controller_message_delay)
-        
-
-    #eSensor.result ()
-    
-    # while True:
-    #     """
-    #     Control Loop for line following 
-    #     """
-    #     sensorReadings = grayscale_sensor_bus.read() #read sensors
-    #     servoAngle = controller_message_bus.read()
-
-    #     if math.isclose(sensorReadings[0],sensorReadings[1], abs_tol = 20) and math.isclose(sensorReadings[0],sensorReadings[2], abs_tol = 20): 
-    #         #if all 3 sensor readings are approximately equal, then picar is probably not sitting on a line. Stop Condition 
-    #         Picar_motors.set_dir_servo_angle(0)
-    #         Picar_motors.stop()
-
-    #     else:
-    #         #Adjust steering angle accordingly and drive forward 
-    #         Picar_motors.set_dir_servo_angle(servoAngle)
-    #         Picar_motors.forward(40)
-    #         time.sleep(0.05)
