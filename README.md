@@ -1,6 +1,8 @@
 # RobotSystems
 ROB599 Project Repo
 
+## robot car code is located in /picar 
+## robot arm code is located in /robotarm
 
 ## Week 2 Assignments 
 
