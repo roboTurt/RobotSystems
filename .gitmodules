@@ -1,3 +1,6 @@
 [submodule "RossROS"]
 	path = picar/RossROS
 	url = git@github.com:rlhatton/RossROS.git
+[submodule "picar/RossROS"]
+	path = picar/RossROS
+	url = git@github.com:rlhatton/RossROS.git
