@@ -175,24 +175,24 @@ def move():
                     if not __isRunning:
                         continue
                     servo2_angle = getAngle(world_X, world_Y, rotation_angle) #计算夹持器需要旋转的角度
-                    Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
+                    Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开 #open gripper 
                     Board.setBusServoPulse(2, servo2_angle, 500)
                     time.sleep(0.5)
                     
                     if not __isRunning:
                         continue
-                    AK.setPitchRangeMoving((world_X, world_Y, 1.5), -90, -90, 0, 1000)
+                    AK.setPitchRangeMoving((world_X, world_Y, 1.5), -90, -90, 0, 1000) #lower gripper
                     time.sleep(1.5)
 
                     if not __isRunning:
                         continue
-                    Board.setBusServoPulse(1, servo1, 500)  #夹持器闭合
+                    Board.setBusServoPulse(1, servo1, 500)  #夹持器闭合 close gripper 
                     time.sleep(0.8)
 
                     if not __isRunning:
                         continue
                     Board.setBusServoPulse(2, 500, 500)
-                    AK.setPitchRangeMoving((world_X, world_Y, 12), -90, -90, 0, 1000)  #机械臂抬起
+                    AK.setPitchRangeMoving((world_X, world_Y, 12), -90, -90, 0, 1000)  #机械臂抬起 #raise gripper 
                     time.sleep(1)
 
                     if not __isRunning:

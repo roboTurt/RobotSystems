@@ -3,8 +3,7 @@
 import sys
 import os
 
-BASE_DIR = os.path.join( os.path.dirname( __file__ ), '..' )
-sys.path.append(BASE_DIR)
+sys.path.append(os.path.dirname(os.getcwd()))
 #sys.path.append('/home/pi/ArmPi/')
 import cv2
 import time
@@ -16,6 +15,7 @@ from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from Perception import *
 from CameraCalibration.CalibrationConfig import *
+from RossROS import rossros 
 
 if sys.version_info.major == 2:
     print('Please run this program with python3!')

@@ -2,7 +2,7 @@
 # encoding:utf-8
 import cv2
 import sys
-sys.path.append('/home/pi/ArmPi/')
+sys.path.append("..")
 import math
 import numpy as np
 from CameraCalibration.CalibrationConfig import *
@@ -11,7 +11,8 @@ from CameraCalibration.CalibrationConfig import *
 image_center_distance = 20
 
 #加载参数
-param_data = np.load(map_param_path + '.npz')
+# param_data = np.load(map_param_path + '.npz')
+param_data = np.load('../CameraCalibration/map_param.npz')
 
 #计算每个像素对应的实际距离
 map_param_ = param_data['map_param']

@@ -27,4 +27,13 @@ imported ```rossros.py``` into ```RossROS```
 Created ```ultrasound.py``` inside ```lib``` for the sensor, controller, and interpreter classes belonging to the ultrasonic distance sensor 
 Created ```lineFollow_rossROS.py``` in Assignments that uses rossros bus classes to simultaneously process grayscale and ultrasonic distance sensor inputs 
 
-### Week 6 Assignments ###
+### Week 6,7 Assignments ###
+
+split car code and arm code into ```/picar``` and ```/robotarm```
+Perception code is located in ```Functions/Perception.py``` 
+Driver code for Perception class is in ```ColorTracking_refactored.py``` 
+
+
+
+
+

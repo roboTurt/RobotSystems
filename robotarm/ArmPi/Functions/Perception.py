@@ -1,12 +1,22 @@
-import cv2
-import math
-from CameraCalibration.CalibrationConfig import *
-from LABConfig import *
-from ArmIK.Transform import *
-import HiwonderSDK.Board as Board
-import numpy as np
-import time 
-from collections import deque
+import os, sys 
+
+# BASE_DIR = os.path.dirname(os.getcwd())
+
+sys.path.append(os.path.dirname(os.getcwd()))
+
+#print(os.path.join('../',BASE_DIR))
+
+# import cv2
+# import math
+# from ArmPi.CameraCalibration import *
+# from LABConfig import *
+# from ArmIK.Transform import *
+# #import HiwonderSDK.Board as Board
+# import numpy as np
+# import time 
+# from collections import deque
+
+from RossROS import rossros 
 
 from ArmState import ArmState
 
@@ -219,15 +229,15 @@ class Perception(ArmState):
                 
                 if not self.start_pick_up:
 
-                    if colorOfMaxContour is 'red':
+                    if colorOfMaxContour == 'red':
                         
                         self.colorList.append(1)
                     
-                    elif colorOfMaxContour is 'green':
+                    elif colorOfMaxContour == 'green':
                         
                         self.colorList.append(2)
                 
-                    elif colorOfMaxContour is 'blue':
+                    elif colorOfMaxContour == 'blue':
                     
                         self.colorList.append(3)
 
