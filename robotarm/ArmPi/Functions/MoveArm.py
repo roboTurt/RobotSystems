@@ -1,5 +1,6 @@
 
 
+from tkinter import Y
 import cv2
 import time
 import Camera
@@ -18,6 +19,7 @@ class MoveArm():
         self.gripperAngle_closed = 500    
         self.last_target_world_X = None
         self.last_target_world_Y = None
+        self.detected_color = None 
         self.AK = ArmIK()
 
 
@@ -30,6 +32,12 @@ class MoveArm():
         Board.setBusServoPulse(1, self.gripperAngle_closed - 50, 300)
         Board.setBusServoPulse(2, 500, 500)
         self.AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+
+    def capture_block_location_and_color(self, X_Coord, Y_Coord, Color):
+
+        self.last_target_world_X = X_Coord
+        self.last_target_world_Y = Y_Coord
+        self.detected_color = Color
 
 
     def set_Arm_RGB_Color(self, detected_color):
@@ -51,17 +59,17 @@ class MoveArm():
             Board.RGB.setPixelColor(1, Board.PixelColor(0, 0, 0))
             Board.RGB.show()
     
-    def match_EF_angle_to_block(self,target_world_X, target_world_Y, target_orientation_angle):
+    def match_endEffector_angle_to_block(self,target_world_X, target_world_Y, target_orientation_angle):
 
         servo2_angle = getAngle(target_world_X, target_world_Y, target_orientation_angle)
         
         return servo2_angle
 
-    def rotate_EF_by_angle(self, targetAngle):
+    def rotate_endEffector_by_angle(self, targetAngle):
         
         Board.setBusServoPulse(2, targetAngle, 500)
 
-    def move_EF_ToTarget(self, target_world_X, target_world_Y):
+    def move_endEffector_to_target(self, target_world_X, target_world_Y):
         
         status = AK.setPitchRangeMoving((target_world_X, target_world_Y, 7), -90, -90, 0)
         
@@ -82,7 +90,7 @@ class MoveArm():
         Board.setBusServoPulse(1, self.gripperAngle_closed - 280, 500)  # 爪子张开 #open gripper 
 
     
-    def adjust_EF_Z_height(self, target_Z_height):
+    def adjust_endEffector_Z_height(self, target_Z_height):
         
         if self.last_target_world_Y and self.last_target_world_X is not None: 
 
@@ -90,8 +98,9 @@ class MoveArm():
             
                                     -90, -90, 0, 1000)
    
-
-    
+    def pickAndPlace(self):
+        
+        pass 
 
 
     

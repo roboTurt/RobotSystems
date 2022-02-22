@@ -46,6 +46,8 @@ if __name__ == '__main__':
     world_Y_target_coord_bus = Bus(name = "world frame Y coordinate of detected object")
     detected_color_bus = Bus(name = "color string of detected object")
 
+    pickAndPlace_status_bus = Bus(name = "status of pick and place maneuver")
+
     termination_bus = Bus(name = "termination bus")
 
     #timer class to control runtime of the script
@@ -78,10 +80,27 @@ if __name__ == '__main__':
                                                                 delay = 1,
                                                                 name = "do CV object detection on processed frames")
 
+
+    # set_endEffector_target_coordinate_service = Consumer(arm_IK.capture_block_location_and_color,
+    #                                             input_busses = [world_X_target_coord_bus, 
+    #                                                             world_Y_target_coord_bus, 
+    #                                                             detected_color_bus],
+    #                                             delay = 1,
+    #                                             name = "sets target coordinates for arm")
+
+    pick_and_place_service = ConsumerProducer(arm_IK.pickAndPlace,
+                                            input_busses = [world_X_target_coord_bus, 
+                                                                    world_Y_target_coord_bus, 
+                                                                    detected_color_bus],
+                                            output_busses = pickAndPlace_status_bus, 
+                                            delay = 1,
+                                            name = "executes pick and place maneuver")
+
     list_of_concurrent_services  = [camera_feed_service.__call__, 
                                     parse_camera_frames_service.__call__,
                                     smooth_camera_frames_service.__call__, 
                                     runCV_on_processed_camera_frames_service.__call__,
+                                    pick_and_place_service.__call__,
                                     ]
 
 
