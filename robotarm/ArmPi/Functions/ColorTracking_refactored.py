@@ -44,6 +44,8 @@ if __name__ == '__main__':
 
     world_X_target_coord_bus = Bus(name = "world frame X coordinate of detected object")
     world_Y_target_coord_bus = Bus(name = "world frame Y coordinate of detected object")
+    object_orientation_bus = Bus(name = "angle of detected object")
+
     detected_color_bus = Bus(name = "color string of detected object")
 
     pickAndPlace_status_bus = Bus(name = "status of pick and place maneuver")
@@ -100,9 +102,11 @@ if __name__ == '__main__':
                                     parse_camera_frames_service.__call__,
                                     smooth_camera_frames_service.__call__, 
                                     runCV_on_processed_camera_frames_service.__call__,
-                                    pick_and_place_service.__call__,
+                                    #pick_and_place_service.__call__,
                                     ]
 
 
     runConcurrently(list_of_concurrent_services)
+
+    cv2.imshow('Frame', processed_camera_image_bus.message)
 

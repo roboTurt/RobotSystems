@@ -6,15 +6,15 @@ sys.path.append(os.path.dirname(os.getcwd()))
 
 #print(os.path.join('../',BASE_DIR))
 
-# import cv2
-# import math
-# from ArmPi.CameraCalibration import *
-# from LABConfig import *
-# from ArmIK.Transform import *
-# #import HiwonderSDK.Board as Board
-# import numpy as np
-# import time 
-# from collections import deque
+import cv2
+import math
+from ArmPi.CameraCalibration import *
+from LABConfig import *
+from ArmIK.Transform import *
+import HiwonderSDK.Board as Board
+import numpy as np
+import time 
+from collections import deque
 
 from RossROS import rossros 
 
@@ -51,6 +51,8 @@ class Perception(ArmState):
         self.colorList = deque([], maxlen = 10)
 
         self.start_pick_up = False
+
+        self.rotation_angle = 0
 
     def setTargetColor(self, targetColor):
 
@@ -251,7 +253,7 @@ class Perception(ArmState):
                     self.t1_Counter_Started = False
                     self.t1 = time.time()
                 if time.time() - self.t1 > 0.5:
-                    rotation_angle = boundingRect[2]
+                    self.rotation_angle = boundingRect[2]
                     self.t1_Counter_Started = True
                     self.block_worldX_coord, self.block_worldY_coord = np.mean(np.array(self.listOfBlockCenterCoords).reshape(self.count, 2), axis=0)
                     self.listOfBlockCenterCoords.clear()
@@ -302,4 +304,4 @@ class Perception(ArmState):
     
         cv2.putText(self.image, "Color: " + detectedColor, (10, self.image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, rgbValue, 2)
         
-        return self.image, detectedColor, self.block_worldX_coord, self.block_worldY_coord
+        return self.image, detectedColor, self.block_worldX_coord, self.block_worldY_coord, self.rotation_angle
