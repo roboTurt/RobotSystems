@@ -3,10 +3,12 @@
 import sys
 import os
 
-from Functions.MoveArm import MoveArm
+
 
 sys.path.append(os.path.dirname(os.getcwd()))
 #sys.path.append('/home/pi/ArmPi/')
+
+import MoveArm
 import cv2
 import time
 import Camera
