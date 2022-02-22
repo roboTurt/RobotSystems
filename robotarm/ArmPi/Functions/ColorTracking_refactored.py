@@ -19,7 +19,7 @@ from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from Perception import *
 from CameraCalibration.CalibrationConfig import *
-from RossROS import rossros 
+from RossROS.rossros import * 
 
 if sys.version_info.major == 2:
     print('Please run this program with python3!')
@@ -40,7 +40,10 @@ if __name__ == '__main__':
 
 
     #Create RossROS busses
-    raw_camera_image_bus = Bus(name = "raw camera image frames to be processed")
+    while my_camera.frame is None:
+        raw_camera_image_bus = Bus(initial_message = my_camera.frame, name = "raw camera image frames to be processed")
+        #print(raw_camera_image_bus.message)
+    
     smoothed_camera_image_bus = Bus(name = "smoothed and cropped camera frames to run CV on")
     processed_camera_image_bus = Bus(name = "image frame post CV object detection")
 
@@ -55,35 +58,51 @@ if __name__ == '__main__':
     termination_bus = Bus(name = "termination bus")
 
     #timer class to control runtime of the script
-    timer = Timer(timer_busses = termination_bus, duration = 20, 
+    timer = Timer(timer_busses = termination_bus, duration = 30, 
                   delay = 1, name = "termination timer") 
 
     #Creating perception RossROS services 
 
-    camera_feed_service = Producer(my_camera.frame, 
+    # raw_camera_image_bus.set_message(my_camera.frame)
+
+    camera_feed_service = Producer(my_camera.get_camera_frame, 
                                     output_busses = raw_camera_image_bus,
-                                    delay = 1,
+                                    delay = 0.2,
+                                    termination_busses = termination_bus,
                                     name = "raw camera images")
 
     parse_camera_frames_service = Consumer(id_blocks.readImageFrame, 
-                                                    input_busses = raw_camera_image_bus,
-                                                    delay = 1,
-                                                    name = "read raw camera images")
+                                            input_busses = raw_camera_image_bus,
+                                            delay = 0.2,
+                                            termination_busses = termination_bus,
+                                            name = "read raw camera images")
 
     smooth_camera_frames_service = Producer(id_blocks.resizeAndSmoothImage, 
                                                     output_busses = smoothed_camera_image_bus,
-                                                    delay = 1,
+                                                    delay = 0.2,
+                                                    termination_busses = termination_bus,
                                                     name = "smooth and crop raw camera images")
 
     runCV_on_processed_camera_frames_service = ConsumerProducer(id_blocks.detectObject,
                                                                 input_busses = smoothed_camera_image_bus,
-                                                                output_busses = [processed_camera_image_bus,
-                                                                                detected_color_bus,
-                                                                                world_X_target_coord_bus,
-                                                                                world_Y_target_coord_bus],
+                                                                output_busses = (processed_camera_image_bus, detected_color_bus, world_X_target_coord_bus, world_Y_target_coord_bus, object_orientation_bus),
                                                                 delay = 1,
+                                                                termination_busses = termination_bus,
                                                                 name = "do CV object detection on processed frames")
+    
 
+    displayImage_service = Consumer(id_blocks.drawImageCV2, 
+                                    input_busses = processed_camera_image_bus,
+                                    delay = 1,
+                                    termination_busses = termination_bus,
+                                    name = "read raw camera images")
+
+    # runCV_on_processed_camera_frames_service = ConsumerProducer(id_blocks.detectObject,
+    #                                                             input_busses = smoothed_camera_image_bus,
+    #                                                             output_busses = (processed_camera_image_bus,detected_color_bus),
+    #                                                             delay = 1.5,
+    #                                                             termination_busses = termination_bus,
+    #                                                             name = "do CV object detection on processed frames")
 
     # set_endEffector_target_coordinate_service = Consumer(arm_IK.capture_block_location_and_color,
     #                                             input_busses = [world_X_target_coord_bus, 
@@ -93,22 +112,29 @@ if __name__ == '__main__':
     #                                             name = "sets target coordinates for arm")
 
     pick_and_place_service = ConsumerProducer(arm_IK.pickAndPlace,
-                                            input_busses = [world_X_target_coord_bus, 
-                                                                    world_Y_target_coord_bus, 
-                                                                    detected_color_bus],
+                                            input_busses = (world_X_target_coord_bus, 
+                                                            world_Y_target_coord_bus, 
+                                                            detected_color_bus),
                                             output_busses = pickAndPlace_status_bus, 
                                             delay = 1,
+                                            termination_busses = termination_bus,
                                             name = "executes pick and place maneuver")
 
+    # list_of_concurrent_services  = [camera_feed_service.__call__, 
+    #                                 parse_camera_frames_service.__call__,
+    #                                 smooth_camera_frames_service.__call__, 
+    #                                 runCV_on_processed_camera_frames_service.__call__,
+    #                                 #pick_and_place_service.__call__,
+    #                                 ]
+
     list_of_concurrent_services  = [camera_feed_service.__call__, 
-                                    parse_camera_frames_service.__call__,
-                                    smooth_camera_frames_service.__call__, 
+                                    parse_camera_frames_service.__call__, 
+                                    smooth_camera_frames_service.__call__,
                                     runCV_on_processed_camera_frames_service.__call__,
-                                    #pick_and_place_service.__call__,
+                                    displayImage_service.__call__,
+                                    # #pick_and_place_service.__call__,
                                     ]
 
+        
 
     runConcurrently(list_of_concurrent_services)
-
-    cv2.imshow('Frame', processed_camera_image_bus.message)
-
