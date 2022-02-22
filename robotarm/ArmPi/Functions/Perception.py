@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.getcwd()))
 
 import cv2
 import math
-from ArmPi.CameraCalibration import *
+from CameraCalibration import *
 from LABConfig import *
 from ArmIK.Transform import *
 import HiwonderSDK.Board as Board
