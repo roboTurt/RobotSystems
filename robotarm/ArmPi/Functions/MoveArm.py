@@ -18,17 +18,18 @@ class MoveArm():
         self.gripperAngle_closed = 500    
         self.last_target_world_X = None
         self.last_target_world_Y = None
+        self.AK = ArmIK()
 
 
     # 初始位置
     def initMove(self):
         """
         move end effector to home position
-        
+
         """
         Board.setBusServoPulse(1, self.gripperAngle_closed - 50, 300)
         Board.setBusServoPulse(2, 500, 500)
-        AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+        self.AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
 
 
     def set_Arm_RGB_Color(self, detected_color):

@@ -182,120 +182,119 @@ class Perception(ArmState):
         previousMaxContour = None 
         rgbValue = (0, 0, 0)
         detectedColor = "None"
-        if not self.start_pick_up:
+        #if not self.start_pick_up:
 
-            for i in color_range:
-                if i in self.targetColor:
-                    targetColor_Range = i
-                    maxContour, maxContourArea = self.findObjectContours(targetColor_Range, processedImageFrame)
+        for i in color_range:
+            if i in self.targetColor:
+                targetColor_Range = i
+                maxContour, maxContourArea = self.findObjectContours(targetColor_Range, processedImageFrame)
 
-                    if maxContour is not None:
+                if maxContour is not None:
 
-                        if maxContourArea > previousMaxContourArea:
+                    if maxContourArea > previousMaxContourArea:
 
-                            previousMaxContourArea = maxContourArea
-                            colorOfMaxContour = i 
-                            previousMaxContour = maxContour 
-
-
-            print(colorOfMaxContour)
-
-            if maxContourArea > self.area_theshold:  # 有找到最大面积
-                # rect = cv2.minAreaRect(areaMaxContour)
-                # box = np.int0(cv2.boxPoints(rect))
-
-                # roi = getROI(box) #获取roi区域
-                # get_roi = True
-
-                boundingRect, boundingRectCoords, regionOfInterest = \
-                            self.convertContourToRegionOfInterest(maxContour)
-
-                self.block_worldX_coord, self.block_worldY_coord = self.convertCameraFrame2WorldFrame(boundingRect, regionOfInterest, 
-                                                                    self.resized_image_dimension, 
-                                                                    square_length)
+                        previousMaxContourArea = maxContourArea
+                        colorOfMaxContour = i 
+                        previousMaxContour = maxContour 
 
 
-                self.drawBox_and_displayCoordinates(boundingRectCoords,targetColor_Range)
+        print(colorOfMaxContour)
 
-                print(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2))
-                print(pow(self.block_worldY_coord - self.last_block_worldY_coord, 2))
-                distance = math.sqrt(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2) + 
-                                    pow(self.block_worldY_coord - self.last_block_worldY_coord,2))
+        if maxContourArea > self.area_theshold:  # 有找到最大面积
+            # rect = cv2.minAreaRect(areaMaxContour)
+            # box = np.int0(cv2.boxPoints(rect))
+
+            # roi = getROI(box) #获取roi区域
+            # get_roi = True
+
+            boundingRect, boundingRectCoords, regionOfInterest = \
+                        self.convertContourToRegionOfInterest(maxContour)
+
+            self.block_worldX_coord, self.block_worldY_coord = self.convertCameraFrame2WorldFrame(boundingRect, regionOfInterest, 
+                                                                self.resized_image_dimension, 
+                                                                square_length)
+
+
+            self.drawBox_and_displayCoordinates(boundingRectCoords,targetColor_Range)
+
+            print(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2))
+            print(pow(self.block_worldY_coord - self.last_block_worldY_coord, 2))
+            distance = math.sqrt(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2) + 
+                                pow(self.block_worldY_coord - self.last_block_worldY_coord,2))
+            
+                                #pow(self.block_worldY_coord - self.last_block_worldY_coord, 2)) #对比上次坐标来判断是否移动
+            #print(distance)
+            
+            self.last_block_worldX_coord, self.last_block_worldY_coord = self.block_worldX_coord, self.block_worldY_coord
+            
+
+            if colorOfMaxContour == 'red':
                 
-                                    #pow(self.block_worldY_coord - self.last_block_worldY_coord, 2)) #对比上次坐标来判断是否移动
-                #print(distance)
+                self.colorList.append(1)
+            
+            elif colorOfMaxContour == 'green':
                 
-                self.last_block_worldX_coord, self.last_block_worldY_coord = self.block_worldX_coord, self.block_worldY_coord
-                
-                if not self.start_pick_up:
+                self.colorList.append(2)
+        
+            elif colorOfMaxContour == 'blue':
+            
+                self.colorList.append(3)
 
-                    if colorOfMaxContour == 'red':
-                        
-                        self.colorList.append(1)
-                    
-                    elif colorOfMaxContour == 'green':
-                        
-                        self.colorList.append(2)
-                
-                    elif colorOfMaxContour == 'blue':
-                    
-                        self.colorList.append(3)
+            else:
+            
+                self.colorList.append(0)
+        
+            if distance < 0.5:
+                self.count += 1
+                self.listOfBlockCenterCoords.extend((self.block_worldX_coord, self.block_worldY_coord))
+                if self.t1_Counter_Started:
+                    self.t1_Counter_Started = False
+                    self.t1 = time.time()
+                if time.time() - self.t1 > 0.5:
+                    rotation_angle = boundingRect[2]
+                    self.t1_Counter_Started = True
+                    self.block_worldX_coord, self.block_worldY_coord = np.mean(np.array(self.listOfBlockCenterCoords).reshape(self.count, 2), axis=0)
+                    self.listOfBlockCenterCoords.clear()
+                    self.count = 0
+                    self.start_pick_up = True
 
-                    else:
-                    
-                        self.colorList.append(0)
-                
-                    if distance < 0.5:
-                        self.count += 1
-                        self.listOfBlockCenterCoords.extend((self.block_worldX_coord, self.block_worldY_coord))
-                        if self.t1_Counter_Started:
-                            self.t1_Counter_Started = False
-                            self.t1 = time.time()
-                        if time.time() - self.t1 > 0.5:
-                            rotation_angle = boundingRect[2]
-                            self.t1_Counter_Started = True
-                            self.block_worldX_coord, self.block_worldY_coord = np.mean(np.array(self.listOfBlockCenterCoords).reshape(self.count, 2), axis=0)
-                            self.listOfBlockCenterCoords.clear()
-                            self.count = 0
-                            self.start_pick_up = True
+            else: 
+                self.t1 = time.time()
+                self.t1_Counter_Started = True
+                self.listOfBlockCenterCoords.clear()
+                self.count = 0
+            #track = True
+            #print(count,distance)
+            # 累计判断
+            # if action_finish:
+            #     if distance < 0.3:
+            #         center_list.extend((world_x, world_y))
+            #         count += 1
+            #         if t1_Counter_Started:
+            #             t1_Counter_Started = False
+            #             t1 = time.time()
+            #         if time.time() - t1 > 1.5:
+            #             rotation_angle = rect[2]
+            #             t1_Counter_Started = True
+            #             world_X, world_Y = np.mean(np.array(center_list).reshape(count, 2), axis=0)
+            #             count = 0
+            #             center_list = []
+            #             start_pick_up = True
+            #     else:
+            #         t1 = time.time()
+            #         t1_Counter_Started = True
+            #         count = 0
+            #         center_list = []
 
-                    else: 
-                        self.t1 = time.time()
-                        self.t1_Counter_Started = True
-                        self.listOfBlockCenterCoords.clear()
-                        self.count = 0
-                #track = True
-                #print(count,distance)
-                # 累计判断
-                # if action_finish:
-                #     if distance < 0.3:
-                #         center_list.extend((world_x, world_y))
-                #         count += 1
-                #         if t1_Counter_Started:
-                #             t1_Counter_Started = False
-                #             t1 = time.time()
-                #         if time.time() - t1 > 1.5:
-                #             rotation_angle = rect[2]
-                #             t1_Counter_Started = True
-                #             world_X, world_Y = np.mean(np.array(center_list).reshape(count, 2), axis=0)
-                #             count = 0
-                #             center_list = []
-                #             start_pick_up = True
-                #     else:
-                #         t1 = time.time()
-                #         t1_Counter_Started = True
-                #         count = 0
-                #         center_list = []
-
-                averageColorValue = int(round(np.mean(np.array(self.colorList))))
-                
-                detectedColor, rgbValue = self.returnDetectedColor(averageColorValue)
+            averageColorValue = int(round(np.mean(np.array(self.colorList))))
+            
+            detectedColor, rgbValue = self.returnDetectedColor(averageColorValue)
            
-        else:
+        # else:
 
-            if not self.start_pick_up:
-                rgbValue = (0, 0, 0)
-                detectedColor = "None"
+        #     if not self.start_pick_up:
+        #         rgbValue = (0, 0, 0)
+        #         detectedColor = "None"
 
         # if move_square:
             
@@ -303,4 +302,4 @@ class Perception(ArmState):
     
         cv2.putText(self.image, "Color: " + detectedColor, (10, self.image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, rgbValue, 2)
         
-        return self.image
+        return self.image, detectedColor, self.block_worldX_coord, self.block_worldY_coord
