@@ -292,11 +292,11 @@ class Perception(ArmState):
             
             detectedColor, rgbValue = self.returnDetectedColor(averageColorValue)
            
-        # else:
+        else:
 
         #     if not self.start_pick_up:
         #         rgbValue = (0, 0, 0)
-        #         detectedColor = "None"
+            detectedColor = "None"
 
         # if move_square:
             
