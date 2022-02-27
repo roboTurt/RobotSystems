@@ -18,12 +18,10 @@ from collections import deque
 
 from RossROS import rossros 
 
-from ArmState import ArmState
-
-class Perception(ArmState):
+class Perception():
 
     def __init__(self, targetColor):
-        super().__init__()
+        #super().__init__()
         #initialize perception class with a target color to track
         self.targetColor = targetColor
         self.image = None 
@@ -92,21 +90,21 @@ class Perception(ArmState):
                     maxContour = c
 
         return maxContour, maxContourArea  # 返回最大的轮廓
-
+    
+    
     def resizeAndSmoothImage(self):
 
         frame_resize = cv2.resize(self.image, self.resized_image_dimension, interpolation=cv2.INTER_NEAREST) #resize
         frame_gaussianBlur = cv2.GaussianBlur(frame_resize, (11, 11), 11) #smooth image
         frame_lab = cv2.cvtColor(frame_gaussianBlur, cv2.COLOR_BGR2LAB)  # transform color space 将图像转换到LAB空间 
-        
+        #print(frame_lab)
         return frame_lab
 
 
     def readImageFrame(self, image):
-        
+        #print(image)
         self.image = image
         image_height, image_width = image.shape[:2]
-
         self.image_height = image_height
         self.image_width = image_width
         cv2.line(self.image, (0, int(image_height / 2)), (image_width, int(image_height / 2)), (0, 0, 200), 1)
@@ -143,7 +141,7 @@ class Perception(ArmState):
         return worldX, worldY 
 
     def drawBox_and_displayCoordinates(self, box, colorRange):
-
+        #print("bish")
         cv2.drawContours(self.image, [box], -1, self.range_rgb[colorRange], 2)
         cv2.putText(self.image, '(' + str(self.block_worldX_coord) + ',' + str(self.block_worldY_coord) + ')', (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.range_rgb[colorRange], 1) #绘制中心点
@@ -166,6 +164,7 @@ class Perception(ArmState):
 
         return detected_color, rgbValue
 
+
     def detectObject(self, processedImageFrame):
 
         """
@@ -185,64 +184,116 @@ class Perception(ArmState):
         rgbValue = (0, 0, 0)
         detectedColor = "None"
         #if not self.start_pick_up:
+        maxContour = None
+        maxContourArea = 0
+        #self.image = processedImageFrame
+        if processedImageFrame is not 0:
+            for i in color_range:
 
-        for i in color_range:
-            if i in self.targetColor:
-                targetColor_Range = i
-                maxContour, maxContourArea = self.findObjectContours(targetColor_Range, processedImageFrame)
+                if i in self.targetColor:
+                    targetColor_Range = i
+                    #print(processedImageFrame)
+                    maxContour, maxContourArea = self.findObjectContours(targetColor_Range, processedImageFrame)
+                    #print(maxContour, maxContourArea)
+                    if maxContour is not None:
 
-                if maxContour is not None:
+                        if maxContourArea > previousMaxContourArea:
 
-                    if maxContourArea > previousMaxContourArea:
-
-                        previousMaxContourArea = maxContourArea
-                        colorOfMaxContour = i 
-                        previousMaxContour = maxContour 
-
-
-        print(colorOfMaxContour)
-
-        if maxContourArea > self.area_theshold:  # 有找到最大面积
-            # rect = cv2.minAreaRect(areaMaxContour)
-            # box = np.int0(cv2.boxPoints(rect))
-
-            # roi = getROI(box) #获取roi区域
-            # get_roi = True
-
-            boundingRect, boundingRectCoords, regionOfInterest = \
-                        self.convertContourToRegionOfInterest(maxContour)
-
-            self.block_worldX_coord, self.block_worldY_coord = self.convertCameraFrame2WorldFrame(boundingRect, regionOfInterest, 
-                                                                self.resized_image_dimension, 
-                                                                square_length)
+                            previousMaxContourArea = maxContourArea
+                            colorOfMaxContour = i 
+                            previousMaxContour = maxContour 
 
 
-            self.drawBox_and_displayCoordinates(boundingRectCoords,targetColor_Range)
+            if maxContourArea > self.area_theshold:  # 有找到最大面积
+                # rect = cv2.minAreaRect(areaMaxContour)
+                # box = np.int0(cv2.boxPoints(rect))
 
-            print(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2))
-            print(pow(self.block_worldY_coord - self.last_block_worldY_coord, 2))
-            distance = math.sqrt(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2) + 
-                                pow(self.block_worldY_coord - self.last_block_worldY_coord,2))
-            
-                                #pow(self.block_worldY_coord - self.last_block_worldY_coord, 2)) #对比上次坐标来判断是否移动
-            #print(distance)
-            
-            self.last_block_worldX_coord, self.last_block_worldY_coord = self.block_worldX_coord, self.block_worldY_coord
-            
+                # roi = getROI(box) #获取roi区域
+                # get_roi = True
 
-            if colorOfMaxContour == 'red':
+                boundingRect, boundingRectCoords, regionOfInterest = self.convertContourToRegionOfInterest(maxContour)
+                self.block_worldX_coord, self.block_worldY_coord = self.convertCameraFrame2WorldFrame(boundingRect, regionOfInterest, 
+                                                                    self.resized_image_dimension, 
+                                                                    square_length)
+
+
+                self.drawBox_and_displayCoordinates(boundingRectCoords,targetColor_Range)
+
+                # print(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2))
+                # print(pow(self.block_worldY_coord - self.last_block_worldY_coord, 2))
+                distance = math.sqrt(pow(self.block_worldX_coord - self.last_block_worldX_coord, 2) + 
+                                    pow(self.block_worldY_coord - self.last_block_worldY_coord,2))
                 
-                self.colorList.append(1)
-            
-            elif colorOfMaxContour == 'green':
+                                    #pow(self.block_worldY_coord - self.last_block_worldY_coord, 2)) #对比上次坐标来判断是否移动
+                #print(distance)
                 
-                self.colorList.append(2)
-        
-            elif colorOfMaxContour == 'blue':
-            
-                self.colorList.append(3)
+                self.last_block_worldX_coord, self.last_block_worldY_coord = self.block_worldX_coord, self.block_worldY_coord
+                
 
+                if colorOfMaxContour == 'red':
+                    
+                    self.colorList.append(1)
+                
+                elif colorOfMaxContour == 'green':
+                    
+                    self.colorList.append(2)
+            
+                elif colorOfMaxContour == 'blue':
+                
+                    self.colorList.append(3)
+
+                else:
+                
+                    self.colorList.append(0)
+            
+                # if distance < 0.5:
+                #     self.count += 1
+                #     self.listOfBlockCenterCoords.extend((self.block_worldX_coord, self.block_worldY_coord))
+                #     if self.t1_Counter_Started:
+                #         self.t1_Counter_Started = False
+                #         self.t1 = time.time()
+                #     if time.time() - self.t1 > 0.5:
+                #         self.rotation_angle = boundingRect[2]
+                #         self.t1_Counter_Started = True
+                #         self.block_worldX_coord, self.block_worldY_coord = np.mean(np.array(self.listOfBlockCenterCoords).reshape(self.count, 2), axis=0)
+                #         self.listOfBlockCenterCoords.clear()
+                #         self.count = 0
+                #         self.start_pick_up = True
+
+                # else: 
+                #     self.t1 = time.time()
+                #     self.t1_Counter_Started = True
+                #     self.listOfBlockCenterCoords.clear()
+                #     self.count = 0
+                #track = True
+                #print(count,distance)
+                # 累计判断
+                # if action_finish:
+                #     if distance < 0.3:
+                #         center_list.extend((world_x, world_y))
+                #         count += 1
+                #         if t1_Counter_Started:
+                #             t1_Counter_Started = False
+                #             t1 = time.time()
+                #         if time.time() - t1 > 1.5:
+                #             rotation_angle = rect[2]
+                #             t1_Counter_Started = True
+                #             world_X, world_Y = np.mean(np.array(center_list).reshape(count, 2), axis=0)
+                #             count = 0
+                #             center_list = []
+                #             start_pick_up = True
+                #     else:
+                #         t1 = time.time()
+                #         t1_Counter_Started = True
+                #         count = 0
+                #         center_list = []
+
+                averageColorValue = int(round(np.mean(np.array(self.colorList))))
+                
+                detectedColor, rgbValue = self.returnDetectedColor(averageColorValue)
+            
             else:
+<<<<<<< HEAD
             
                 self.colorList.append(0)
         
@@ -297,11 +348,31 @@ class Perception(ArmState):
         #     if not self.start_pick_up:
         #         rgbValue = (0, 0, 0)
             detectedColor = "None"
+=======
 
-        # if move_square:
+                #if not self.start_pick_up:
+                rgbValue = (0, 0, 0)
+                detectedColor = "None"
+>>>>>>> f85c39923025a9fd544b7c67e1c7c104ffaf133f
+
+            # if move_square:
+                
+            #     cv2.putText(self.image, "Make sure no blocks in the stacking area", (15, int(self.image.shape[0]/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)    
             
-        #     cv2.putText(self.image, "Make sure no blocks in the stacking area", (15, int(self.image.shape[0]/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)    
-    
-        cv2.putText(self.image, "Color: " + detectedColor, (10, self.image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, rgbValue, 2)
+            cv2.putText(self.image, "Color: " + detectedColor, (10, self.image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, rgbValue, 2)
+            #print(self.image)
+            # cv2.imshow('Frame', self.image)
+            # cv2.waitkey()
+            #print([self.image, detectedColor, self.block_worldX_coord, self.block_worldY_coord, self.rotation_angle])
+            return [self.image, detectedColor, self.block_worldX_coord, self.block_worldY_coord, self.rotation_angle]
         
-        return self.image, detectedColor, self.block_worldX_coord, self.block_worldY_coord, self.rotation_angle
+        else:
+
+            return [self.image,None,None,None,None]
+    
+
+    def drawImageCV2(self,image):
+        print(image[1])
+        if image[0] is not None:
+            cv2.imshow('Frame',image[0])
+            cv2.waitKey(1)
