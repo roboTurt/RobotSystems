@@ -15,6 +15,13 @@ import HiwonderSDK.Board as Board
 import numpy as np
 import time 
 from collections import deque
+import logging
+from logdecorator import log_on_start, log_on_end, log_on_error
+
+DEBUG = logging.DEBUG
+logging_format = "%(asctime)s: %(message)s"
+logging.basicConfig(format=logging_format, level=logging.INFO,
+                    datefmt="%H:%M:%S")
 
 from RossROS import rossros 
 
@@ -315,7 +322,7 @@ class Perception():
     
 
     def drawImageCV2(self,image):
-        print(image[1])
+        #print(image[1])
         if image[0] is not None:
             cv2.imshow('Frame',image[0])
             cv2.waitKey(1)
